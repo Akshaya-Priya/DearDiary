@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { DiaryService } from '@/lib/supabase';
-import { Loader2 } from 'lucide-react';
+import { Loader2 , X} from 'lucide-react';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -12,17 +12,25 @@ export default function SignupPage() {
   const [username, setUsername] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showModal, setShowModal] = useState(false);
 
   const handleSignup = async () => {
     setLoading(true);
     setError('');
     const { error } = await DiaryService.signUp(email, password, username);
+    setLoading(false);
+
     if (error) {
       setError(error.message);
     } else {
-      router.push('/login');
+      // router.push('/login');
+      setShowModal(true);
     }
-    setLoading(false);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    router.push('/login'); // navigate to login
   };
 
   return (
@@ -33,7 +41,7 @@ export default function SignupPage() {
         {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
 
         <div className="space-y-4">
-           <input
+          <input
             type="text"
             placeholder="Username"
             value={username}
@@ -71,6 +79,32 @@ export default function SignupPage() {
           Already have an account? <a href="/login" className="text-pink-500 hover:underline">Log in</a>
         </p>
       </div>
+
+      {/* MODAL */}
+        {showModal && (
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-white rounded-xl shadow-lg p-6 w-[90%] max-w-md relative">
+              <button
+                onClick={handleCloseModal}
+                className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              <h3 className="text-xl font-semibold text-rose-600 mb-2">Confirm Your Email</h3>
+              <p className="text-sm text-gray-700">
+                A confirmation link has been sent to <strong>{email}</strong>. Please check your inbox and confirm your email before logging in.
+              </p>
+
+              <button
+                onClick={handleCloseModal}
+                className="mt-6 w-full py-2 rounded-md bg-rose-500 text-white hover:bg-rose-600 transition"
+              >
+                Got it
+              </button>
+            </div>
+          </div>
+        )}
     </div>
   );
 }
