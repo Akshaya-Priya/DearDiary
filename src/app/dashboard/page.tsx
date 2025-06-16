@@ -19,6 +19,7 @@ import { toast } from "@/hooks/use-toast";
 import { Calendar as CalendarIcon, Plus } from "lucide-react"
 import { useUserSession } from "@/hooks/useUserSession";
 import { DiaryService } from '@/lib/supabase';
+import { CalendarHeart, NotebookPen } from 'lucide-react';
 
 export default function DashboardPage() {
   const { session } = useUserSession();
@@ -73,6 +74,18 @@ const [entries, setEntries] = useState<DiaryEntry[]>([]);
     setEntryEdit(null);
     setEditorOpen(true);
   }
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  useEffect(() => {
+    const updateMedia = () => {
+      setIsDesktop(window.innerWidth >= 768);
+    };
+
+    updateMedia(); // Initial check
+    window.addEventListener("resize", updateMedia);
+    return () => window.removeEventListener("resize", updateMedia);
+  }, []);
+
 
   async function handleSave(entry: any) {
     if (editorMode === "add") {
@@ -119,7 +132,7 @@ const [entries, setEntries] = useState<DiaryEntry[]>([]);
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-orange-50">
       <nav className="bg-white/70 backdrop-blur-md shadow px-6 py-4 flex justify-between items-center">
-        <div className="text-xl font-bold text-rose-500">Dear Diary 📔</div>
+        <div className=" flex items-center gap-4 text-xl font-bold text-rose-500"> <NotebookPen size={25} />Dear Diary </div>
         <div className="flex gap-4 items-center">
           <span className="text-gray-600 font-medium">Hi, {username}</span>
           <button
@@ -137,7 +150,7 @@ const [entries, setEntries] = useState<DiaryEntry[]>([]);
           <SearchBar value={search} onChange={v => { setSearch(v); setCalendarFilter(null); }} />
 
           {/* Show calendar only on desktop or if toggled on mobile */}
-          {(showCalendar || window.innerWidth >= 768) && (
+          {(showCalendar || isDesktop) && (
             <DiaryCalendar
               streakDays={streakInfo?.days || []}
               currentStreak={streakInfo?.currentStreak || 0}
