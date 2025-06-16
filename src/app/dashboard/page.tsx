@@ -6,6 +6,7 @@ import DiaryList from "@/components/DiaryList";
 import DiaryEditor from "@/components/DiaryEditor";
 import DiaryCalendar from "@/components/DiaryCalendar";
 import SearchBar from "@/components/SearchBar";
+import Link from 'next/link';
 import {
   getAllEntries,
   addEntry,
@@ -135,6 +136,11 @@ const [entries, setEntries] = useState<DiaryEntry[]>([]);
         <div className=" flex items-center gap-4 text-xl font-bold text-rose-500"> <NotebookPen size={25} />Dear Diary </div>
         <div className="flex gap-4 items-center">
           <span className="text-gray-600 font-medium">Hi, {username}</span>
+          <Link href="/diary">
+            <button className="text-sm px-4 py-2 bg-gradient-to-r from-rose-400 to-pink-400 hover:from-rose-500 hover:to-pink-500 text-white rounded-xl transition-all shadow">
+              Diary
+            </button>
+          </Link>
           <button
             onClick={handleLogout}
             className="text-sm bg-rose-300 hover:bg-rose-500 text-white px-3 py-1 rounded-xl shadow"

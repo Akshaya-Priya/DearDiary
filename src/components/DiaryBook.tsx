@@ -3,7 +3,7 @@ import DiaryPage from "./DiaryPage";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
 // Load page-turn sound (small mp3 in public or external)
-const PAGE_TURN_URL = "https://cdn.pixabay.com/audio/2022/03/15/audio_122b2a1b51.mp3";
+const PAGE_TURN_URL = "pageflip_01-81244.mp3";
 
 type DiaryEntry = {
   id: number;

@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, ChangeEvent } from "react";
-import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Image } from "lucide-react";
 
@@ -14,15 +14,15 @@ type DiaryEntry = {
 interface Props {
   open: boolean;
   mode: "add" | "edit";
-  entry?: DiaryEntry;
-  onSave: (entry: DiaryEntry) => void;
+  entry?: DiaryEntry |null;
+  onSave: (entry: DiaryEntry) => Promise<void>;
   onClose: () => void;
 }
 
 export default function DiaryEditor({ open, mode, entry, onSave, onClose }: Props) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [date, setDate] = useState(entry?.date || (new Date().toISOString().slice(0,10)));
+  const [date, setDate] = useState("");
   const [image, setImage] = useState<string | null>(null);
   const [imgFile, setImgFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -47,6 +47,14 @@ export default function DiaryEditor({ open, mode, entry, onSave, onClose }: Prop
     }
   }, [entry, mode, open]);
 
+  useEffect(() => {
+  if (entry?.date) {
+    setDate(entry.date);
+  } else {
+    setDate(new Date().toISOString().slice(0, 10));
+  }
+}, [entry]);
+
   function handleImageChange(e: ChangeEvent<HTMLInputElement>) {
     if (e.target.files && e.target.files[0]) {
       setImgFile(e.target.files[0]);
@@ -58,20 +66,24 @@ export default function DiaryEditor({ open, mode, entry, onSave, onClose }: Prop
     }
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    onSave({
-      id: entry?.id,
-      title: title.trim() ? title : "",
+    const newEntry: DiaryEntry = {
+      id: entry?.id ?? Date.now(), // or 0 if new entries get an id later
+      title,
       content,
       date,
-      image,
-    });
+      image: image || null,
+    };
+
+    await onSave(newEntry);
+    onClose();
   }
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-lg w-full p-6">
+        <DialogTitle className="sr-only">Edit Diary Entry</DialogTitle>
         <DialogHeader>
           <span className="text-lg font-bold text-rose-500 mb-2">{mode === "add" ? "Add New Entry" : "Edit Entry"}</span>
         </DialogHeader>
