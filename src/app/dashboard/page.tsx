@@ -16,7 +16,7 @@ import {
   getStreakInfo,
 } from "@/lib/diaryService";
 import { toast } from "@/hooks/use-toast";
-import { Plus } from "lucide-react";
+import { Calendar as CalendarIcon, Plus } from "lucide-react"
 import { useUserSession } from "@/hooks/useUserSession";
 import { DiaryService } from '@/lib/supabase';
 
@@ -47,13 +47,17 @@ const [entries, setEntries] = useState<DiaryEntry[]>([]);
     maxStreak: number;
     days: string[];
   } | null>(null);
-
+  const [showCalendar, setShowCalendar] = useState(false);
+  
   async function loadEntries() {
     let data = [];
     if (calendarFilter) data = await findEntriesByDate(calendarFilter);
     else if (search) data = await findEntriesByKeyword(search);
     else data = await getAllEntries();
     setEntries(data);
+
+    const info = await getStreakInfo();
+    setStreakInfo(info);
   }
 
   useEffect(() => {
@@ -64,20 +68,6 @@ const [entries, setEntries] = useState<DiaryEntry[]>([]);
     loadEntries();
   }, [session, calendarFilter, search]);
 
-  
-  useEffect(() => {
-    async function fetchStreak() {
-      try {
-        const info = await getStreakInfo(); // call backend function
-        setStreakInfo(info); // update local state
-      } catch 
-      (error) {
-        console.error("Failed to fetch streak info", error);
-      }
-    }
-
-    fetchStreak();
-  }, []);
   function handleAdd() {
     setEditorMode("add");
     setEntryEdit(null);
@@ -123,7 +113,7 @@ const [entries, setEntries] = useState<DiaryEntry[]>([]);
 
   async function handleLogout() {
     await DiaryService.signOut();
-    window.location.href = "/auth/login";
+    window.location.href = "/login";
   }
 
   return (
@@ -142,17 +132,53 @@ const [entries, setEntries] = useState<DiaryEntry[]>([]);
       </nav>
 
       <div className="flex flex-col md:flex-row gap-8 px-2 md:px-8 py-8 max-w-7xl mx-auto">
+        {/* SIDEBAR */}
+        <div className="w-full md:w-64 flex-shrink-0 flex flex-col gap-7">
+          <SearchBar value={search} onChange={v => { setSearch(v); setCalendarFilter(null); }} />
+
+          {/* Show calendar only on desktop or if toggled on mobile */}
+          {(showCalendar || window.innerWidth >= 768) && (
+            <DiaryCalendar
+              streakDays={streakInfo?.days || []}
+              currentStreak={streakInfo?.currentStreak || 0}
+              maxStreak={streakInfo?.maxStreak || 0}
+              onSelectDate={handleCalendarSelect}
+              selectedDate={calendarFilter}
+              disableFutureDates
+            />
+          )}
+
+          {calendarFilter && (
+            <button
+              className="text-xs text-rose-400 mt-2 underline"
+              onClick={() => setCalendarFilter(null)}
+            >
+              Show all entries
+            </button>
+          )}
+        </div>
+
 
         {/* MAIN */}
         <div className="flex-1">
-          <div className="flex justify-end mb-4">
-            <button
-              onClick={handleAdd}
-              className="flex items-center gap-1 bg-rose-400 hover:bg-rose-500 text-white px-4 py-2 rounded-xl transition shadow"
-            >
-              <Plus /> New Entry
-            </button>
-          </div>
+          <div className="flex justify-between mb-4">
+          {/* Show calendar toggle on small screens */}
+          <button
+            onClick={() => setShowCalendar(prev => !prev)}
+            className="md:hidden flex items-center gap-1 bg-rose-100 hover:bg-rose-200 text-rose-500 px-3 py-1 rounded-xl transition shadow"
+          >
+            <CalendarIcon size={18} />
+            {showCalendar ? "Hide Calendar" : "Show Calendar"}
+          </button>
+
+          {/* New Entry button */}
+          <button
+            onClick={handleAdd}
+            className="flex items-center gap-1 bg-rose-400 hover:bg-rose-500 text-white px-4 py-2 rounded-xl transition shadow"
+          >
+            <Plus /> New Entry
+          </button>
+        </div>
           <DiaryList
             entries={entries}
             onEdit={handleEdit}

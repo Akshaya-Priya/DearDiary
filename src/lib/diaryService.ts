@@ -112,43 +112,49 @@ export async function findEntriesByDate(dateStr: string) {
 
 export async function getStreakInfo() {
   const entries = await getAllEntries();
-  const days = Array.from(new Set(entries.map((e) => e.date))).sort();
+  const dateSet = new Set(entries.map(e => new Date(e.date).toDateString()));
+  const sortedDays = Array.from(dateSet)
+    .map(d => new Date(d))
+    .sort((a, b) => a.getTime() - b.getTime());
 
-  let currentStreak = 0,
-    maxStreak = 0;
-  let prev = null,
-    streak = 0;
+  let maxStreak = 0;
+  let currentStreak = 0;
+  let streak = 1;
 
-  for (const d of days) {
-    const date = new Date(d);
-    if (prev && date.getTime() - prev.getTime() === 86400000) {
+  // Calculate maxStreak
+  for (let i = 1; i < sortedDays.length; i++) {
+    const prev = new Date(sortedDays[i - 1]);
+    const curr = new Date(sortedDays[i]);
+
+    const diff = (curr.getTime() - prev.getTime()) / 86400000;
+
+    if (diff === 1) {
       streak++;
     } else {
       streak = 1;
     }
+
     maxStreak = Math.max(maxStreak, streak);
-    prev = date;
   }
 
-  // Calculate current streak
-  if (days.length) {
-    let i = days.length - 1;
-    let date = new Date(days[i]);
-    let today = new Date();
-    today.setHours(0, 0, 0, 0);
-    let diff = (today.getTime() - date.getTime()) / 86400000;
+  // Calculate currentStreak (starting from yesterday or today)
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const todayStr = today.toDateString();
 
-    streak = diff === 0 || diff === 1 ? 1 : 0;
+  let currentDate = dateSet.has(todayStr)
+    ? new Date(today) // include today
+    : new Date(today.getTime() - 86400000); // start from yesterday
 
-    for (; i > 0; i--) {
-      let prevDate = new Date(days[i - 1]);
-      let curDate = new Date(days[i]);
-      if (curDate.getTime() - prevDate.getTime() === 86400000) streak++;
-      else break;
-    }
-
-    currentStreak = streak;
+  currentStreak = 0;
+  while (dateSet.has(currentDate.toDateString())) {
+    currentStreak++;
+    currentDate = new Date(currentDate.getTime() - 86400000); // go to previous day
   }
 
-  return { days, currentStreak, maxStreak };
+  return {
+    days: sortedDays.map(d => d.toISOString().slice(0, 10)), // return string dates
+    currentStreak,
+    maxStreak: Math.max(maxStreak, 1), // edge case if only 1 entry
+  };
 }
