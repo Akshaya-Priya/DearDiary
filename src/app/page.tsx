@@ -17,6 +17,7 @@ export default function HomePage() {
   }, [session, router]);
 
   return (
+    <>
     <main className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-rose-50 via-pink-50 to-orange-100 px-6">
       <div className="max-w-2xl text-center space-y-6">
         <h1 className="text-4xl md:text-5xl font-bold text-rose-500 flex items-center justify-center gap-2">
@@ -48,6 +49,8 @@ export default function HomePage() {
           Your thoughts stay private. No distractions, just you and your diary.
         </p>
       </div>
+      
     </main>
+    </>
   );
 }

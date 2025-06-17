@@ -20,7 +20,7 @@ import { toast } from "@/hooks/use-toast";
 import { Calendar as CalendarIcon, Plus } from "lucide-react"
 import { useUserSession } from "@/hooks/useUserSession";
 import { DiaryService } from '@/lib/supabase';
-import { CalendarHeart, NotebookPen } from 'lucide-react';
+import { NotebookPen } from 'lucide-react';
 
 export default function DashboardPage() {
   const { session } = useUserSession();
@@ -206,7 +206,6 @@ const [entries, setEntries] = useState<DiaryEntry[]>([]);
           />
         </div>
       </div>
-
       <DiaryEditor
         open={editorOpen}
         mode={editorMode}

@@ -170,7 +170,6 @@ export default function DiaryReaderPage() {
           </div>
         </main>
       </div>
-
       <DiaryEditor
         open={editorOpen}
         mode={editorMode}
