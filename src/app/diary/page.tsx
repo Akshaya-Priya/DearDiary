@@ -11,7 +11,7 @@ import {
 } from "@/lib/diaryService";
 import { Plus, NotebookPen  } from "lucide-react";
 import DiaryEditor from "@/components/DiaryEditor";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "react-toastify";
 import { DiaryService } from "@/lib/supabase";
 import Link from 'next/link';
 
@@ -93,13 +93,13 @@ export default function DiaryReaderPage() {
     if (editorMode === "add") {
       const newEntry = await addEntry(entry);
       setEntries((prev) => [newEntry, ...prev]);
-      toast({ title: "Diary entry added!" });
+      toast.success("Diary entry added!" );
     } else {
       const updated = await updateEntry(entry.id, entry);
       setEntries((prev) =>
         prev.map((e) => (e.id === entry.id ? updated : e))
         );
-      toast({ title: "Entry updated!" });
+      toast.success("Entry updated!");
     }
     setEditorOpen(false);
     setEditorMode("add");
@@ -109,7 +109,7 @@ export default function DiaryReaderPage() {
 
   async function handleDelete(id: number) {
     await deleteEntry(id);
-    toast({ title: "Deleted entry" });
+    toast.success("Deleted entry");
     await syncEntries();
   }
 

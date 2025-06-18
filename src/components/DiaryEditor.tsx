@@ -1,15 +1,8 @@
 import { useEffect, useState, useRef, ChangeEvent } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Image } from "lucide-react";
-
-type DiaryEntry = {
-  id?: number;
-  title: string;
-  content: string;
-  date: string;
-  image?: string | null;
-};
+import { Image as ImageIcon } from "lucide-react";
+import { DiaryEntry } from '../types/diary';
 
 interface Props {
   open: boolean;
@@ -24,7 +17,7 @@ export default function DiaryEditor({ open, mode, entry, onSave, onClose }: Prop
   const [content, setContent] = useState("");
   const [date, setDate] = useState("");
   const [image, setImage] = useState<string | null>(null);
-  const [imgFile, setImgFile] = useState<File | null>(null);
+  // const [imgFile, setImgFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Reset form if entry/ mode changes
@@ -36,14 +29,12 @@ export default function DiaryEditor({ open, mode, entry, onSave, onClose }: Prop
       setContent(entry.content || "");
       setDate(entry.date || new Date().toISOString().slice(0, 10));
       setImage(entry.image || null);
-      setImgFile(null);
     } else if (mode === "add") {
       // Clear all fields
       setTitle("");
       setContent("");
       setDate(new Date().toISOString().slice(0, 10));
       setImage(null);
-      setImgFile(null);
     }
   }, [entry, mode, open]);
 
@@ -57,7 +48,7 @@ export default function DiaryEditor({ open, mode, entry, onSave, onClose }: Prop
 
   function handleImageChange(e: ChangeEvent<HTMLInputElement>) {
     if (e.target.files && e.target.files[0]) {
-      setImgFile(e.target.files[0]);
+      // setImgFile(e.target.files[0]);
       const reader = new FileReader();
       reader.onload = (ev: ProgressEvent<FileReader>) => {
         if (ev.target?.result) setImage(ev.target.result as string);
@@ -123,7 +114,7 @@ export default function DiaryEditor({ open, mode, entry, onSave, onClose }: Prop
                 onChange={handleImageChange}
               />
               <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
-                <Image className="mr-1" size={18} /> {image ? "Change" : "Add"} Image
+                <ImageIcon className="mr-1" size={18} /> {image ? "Change" : "Add"} Image
               </Button>
             </label>
             {image && (
@@ -139,7 +130,6 @@ export default function DiaryEditor({ open, mode, entry, onSave, onClose }: Prop
                   size="sm"
                   onClick={() => {
                     setImage(null);
-                    setImgFile(null);
                   }}
                 >
                   Remove

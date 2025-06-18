@@ -13,7 +13,7 @@ export async function getAllEntries() {
     .from("diary_entries")
     .select("*")
     .eq('user_id', user.id)
-    .order("date", { ascending: false });
+    .limit(10);
 
   if (error) {
     console.error("Fetch error:", error.message);

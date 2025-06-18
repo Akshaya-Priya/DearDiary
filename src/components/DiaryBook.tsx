@@ -1,17 +1,10 @@
 import { useState, useRef } from "react";
 import DiaryPage from "./DiaryPage";
 import { ArrowLeft, ArrowRight } from "lucide-react";
+import { DiaryEntry } from '../types/diary'
 
 // Load page-turn sound (small mp3 in public or external)
 const PAGE_TURN_URL = "pageflip_01-81244.mp3";
-
-type DiaryEntry = {
-  id: number;
-  title: string;
-  content: string;
-  date: string;
-  image?: string | null;
-};
 
 interface Props {
   entries: DiaryEntry[];
@@ -65,7 +58,7 @@ export default function DiaryBook({ entries, onEdit, onDelete }: Props) {
   }
 
   // Calculate which pages to show during animation.
-  let currentEntry = entries[page];
+  const currentEntry = entries[page];
   let underneathEntry: DiaryEntry | null = null;
   if (pageTurning === "right" && page < entries.length - 1 && prevPage !== null) {
     // Next page is coming in underneath

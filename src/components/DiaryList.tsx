@@ -1,21 +1,13 @@
-import { BookOpen, Edit, Trash2, Image as ImageIcon } from "lucide-react";
-
-type DiaryEntry = {
-  id: number;
-  title: string;
-  content: string;
-  date: string;
-  image?: string | null;
-};
+import { BookOpen, Edit, Trash2 } from "lucide-react";
+import { DiaryEntry } from '../types/diary';
 
 interface Props {
   entries: DiaryEntry[];
   onEdit: (entry: DiaryEntry) => void;
   onDelete: (id: number) => void;
-  onOpen: (entry: DiaryEntry) => void;
 }
 
-export default function DiaryList({ entries, onEdit, onDelete, onOpen }: Props) {
+export default function DiaryList({ entries, onEdit, onDelete }: Props) {
   if (!entries.length) {
     return (
       <div className="flex flex-col items-center text-rose-300 py-10">
@@ -30,7 +22,7 @@ export default function DiaryList({ entries, onEdit, onDelete, onOpen }: Props) 
         <div
           key={entry.id}
           className="bg-white/75 shadow-md rounded-xl p-4 flex flex-col hover:ring-2 ring-rose-200 transition group cursor-pointer"
-          onClick={() => onOpen(entry)}
+          onClick={() => {}}
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">

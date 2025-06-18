@@ -16,24 +16,15 @@ import {
   findEntriesByDate,
   getStreakInfo,
 } from "@/lib/diaryService";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "react-toastify";
 import { Calendar as CalendarIcon, Plus } from "lucide-react"
 import { useUserSession } from "@/hooks/useUserSession";
 import { DiaryService } from '@/lib/supabase';
 import { NotebookPen } from 'lucide-react';
+import { DiaryEntry } from '../../types/diary';
 
 export default function DashboardPage() {
   const { session } = useUserSession();
-  
-// Define the shape of your diary entry
-type DiaryEntry = {
-  id: number;
-  title: string;
-  content: string;
-  date: string;
-  image?: string | null;
-  user_id: string;
-};
 
 // Set your state properly typed
 const [entries, setEntries] = useState<DiaryEntry[]>([]);
@@ -41,8 +32,7 @@ const [entries, setEntries] = useState<DiaryEntry[]>([]);
   const [calendarFilter, setCalendarFilter] = useState<string | null>(null);
   const [editorOpen, setEditorOpen] = useState(false);
   const [editorMode, setEditorMode] = useState<"add" | "edit">("add");
-  const [entryEdit, setEntryEdit] = useState<any>(null);
-  const [entryView, setEntryView] = useState<any>(null);
+  const [entryEdit, setEntryEdit] = useState<DiaryEntry | null>(null);
   const [username, setUsername] = useState<string>("");
   const [streakInfo, setStreakInfo] = useState<{
     currentStreak: number;
@@ -51,7 +41,17 @@ const [entries, setEntries] = useState<DiaryEntry[]>([]);
   } | null>(null);
   const [showCalendar, setShowCalendar] = useState(false);
   
-  async function loadEntries() {
+  // async function loadEntries() {
+  //   let data = [];
+  //   if (calendarFilter) data = await findEntriesByDate(calendarFilter);
+  //   else if (search) data = await findEntriesByKeyword(search);
+  //   else data = await getAllEntries();
+  //   setEntries(data);
+
+  //   const info = await getStreakInfo();
+  //   setStreakInfo(info);
+  // }
+  const loadEntries = React.useCallback(async () => {
     let data = [];
     if (calendarFilter) data = await findEntriesByDate(calendarFilter);
     else if (search) data = await findEntriesByKeyword(search);
@@ -60,7 +60,8 @@ const [entries, setEntries] = useState<DiaryEntry[]>([]);
 
     const info = await getStreakInfo();
     setStreakInfo(info);
-  }
+  }, [calendarFilter, search]);
+
 
   useEffect(() => {
     if (session?.user) {
@@ -68,7 +69,7 @@ const [entries, setEntries] = useState<DiaryEntry[]>([]);
       setUsername(name);
     }
     loadEntries();
-  }, [session, calendarFilter, search]);
+  }, [session, loadEntries]);
 
   function handleAdd() {
     setEditorMode("add");
@@ -88,13 +89,13 @@ const [entries, setEntries] = useState<DiaryEntry[]>([]);
   }, []);
 
 
-  async function handleSave(entry: any) {
+  async function handleSave(entry: DiaryEntry) {
     if (editorMode === "add") {
       await addEntry(entry);
-      toast({ title: "Diary entry added!" });
+      toast.success("Diary entry added!");
     } else {
       await updateEntry(entry.id, entry);
-      toast({ title: "Entry updated!" });
+      toast.success("Entry updated!");
     }
     setEditorOpen(false);
     setEditorMode("add");
@@ -104,7 +105,7 @@ const [entries, setEntries] = useState<DiaryEntry[]>([]);
     setTimeout(loadEntries, 50);
   }
 
-  function handleEdit(entry: any) {
+  function handleEdit(entry: DiaryEntry) {
     setEditorMode("edit");
     setEntryEdit(entry);
     setEditorOpen(true);
@@ -112,17 +113,13 @@ const [entries, setEntries] = useState<DiaryEntry[]>([]);
 
   async function handleDelete(id: number) {
     await deleteEntry(id);
-    toast({ title: "Deleted entry" });
+    toast.success("Deleted entry" );
     setTimeout(loadEntries, 40);
   }
 
   function handleCalendarSelect(date: string) {
     setCalendarFilter(date);
     setSearch("");
-  }
-
-  function handleEntryOpen(entry: any) {
-    setEntryView(entry);
   }
 
   async function handleLogout() {
@@ -202,7 +199,6 @@ const [entries, setEntries] = useState<DiaryEntry[]>([]);
             entries={entries}
             onEdit={handleEdit}
             onDelete={handleDelete}
-            onOpen={handleEntryOpen}
           />
         </div>
       </div>
