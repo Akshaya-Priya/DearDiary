@@ -13,7 +13,11 @@
 - 📱 Fully responsive layout
 
 ---
+## 🎬 Demo Video & Live Demo
 
+- **Demo Video:** [Dear Diary App Demo Video](https://drive.google.com/file/d/1z6X9U_q-sFF7_OICyM4wNmS43-A66mpo/view?usp=sharing)
+- **Live Demo:** [Visit Demo Site](https://dear-diary-1523.vercel.app/)
+---
 ## 🔧 Tech Stack
 
 - **Next.js 13+** (App Router)
